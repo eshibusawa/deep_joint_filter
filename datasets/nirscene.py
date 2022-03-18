@@ -3,8 +3,8 @@ import random
 import numpy as np
 from imageio import imread, imsave
 
-
-from gauss_noise import add_gaussian_noise
+import add_path
+from dataset import add_gaussian_noise
 
 
 def is_image(fn):
@@ -71,7 +71,7 @@ def resave(ori_path, tgt_path):
             # add noise
             fn_noise_tgt = os.path.join(tgt_noise_path, foldername + "_" + basename.replace("rgb", "noise") + ".png")
             im_noise = add_gaussian_noise(im, noise_sigma)
-            imsave(fn_noise_tgt, im_noise.astype(np.uint8))
+            imsave(fn_noise_tgt, im_noise)
 
             # nir
             fn_nir = flist_nir[i]

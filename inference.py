@@ -1,7 +1,8 @@
 import argparse
 
-from src.parser import YamlParser
-from src.deep_joint_filter import DeepJointFilter
+import add_path
+from yaml_parser import YamlParser
+from deep_joint_filter import DeepJointFilter
 
 
 def parse_args():

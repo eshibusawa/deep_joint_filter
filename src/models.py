@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import os
 
-from .networks import DeepJointFilterNetwork
+from networks import DeepJointFilterNetwork
 
 
 class BaseModel(nn.Module):

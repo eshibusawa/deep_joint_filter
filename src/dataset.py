@@ -7,7 +7,7 @@ import numpy as np
 from torch.utils.data import DataLoader
 from imageio import imread
 
-from .utils import load_flist
+from utils import load_flist
 
 
 class Dataset(torch.utils.data.Dataset):
