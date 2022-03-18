@@ -1,7 +1,4 @@
-import cv2
 import os
-import glob
-import skimage
 import numpy as np
  
 def add_gaussian_noise(image_in, noise_sigma=25):
@@ -26,6 +23,7 @@ def add_gaussian_noise(image_in, noise_sigma=25):
 
 
 if __name__ == "__main__":
+    import cv2
     img_path = os.getcwd()+'/data/depart/label/1/0.png'
     img = cv2.imread(img_path,0)
     noise_sigma = 25

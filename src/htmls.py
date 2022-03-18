@@ -29,7 +29,7 @@ class HTML(object):
                         with td(style="word-wrap: break-word;", halign="center", valign="top"):
                             with p():
                                 basename = basename_list[idx]
-                                linker = os.path.join(path, basename) 
+                                linker = os.path.join(path, basename)
                                 with a(href=linker):
                                     img(style="width:%dpx" %(width), src=linker)
                                     idx += 1
@@ -116,4 +116,3 @@ if __name__ == "__main__":
     html_compare.compare(flist, **path_ext_dict)
     savename = "./checkpoints/places2_dfg_bs1_size256_sblk11111_0602_wclsinfo_nomultidis_novgggrad/html_test_compare.html"
     html_compare.save(savename)
-    import ipdb; ipdb.set_trace()

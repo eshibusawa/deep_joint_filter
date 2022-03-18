@@ -1,12 +1,11 @@
 import os
 import random
 import torch
-import torchvision
 import torchvision.transforms.functional as F
 import PIL.Image as Image
 import numpy as np
 from torch.utils.data import DataLoader
-from scipy.misc import imread, imresize
+from imageio import imread
 
 from .utils import load_flist
 
@@ -97,7 +96,7 @@ class Dataset(torch.utils.data.Dataset):
 
 
     def resize(self, img):
-        return imresize(img, size=self.input_size)
+        return np.array(Image.fromarray(img).resize(size=self.input_size))
 
 
     def random_crop(self, img_target, img_guide, img_gt):
@@ -205,7 +204,7 @@ class InferenceDataset(torch.utils.data.Dataset):
 
 
     def resize(self, img):
-        return imresize(img, size=self.input_size)
+        return np.array(Image.fromarray(img).resize(size=self.input_size))
 
 
     def random_crop(self, img_target, img_guide, img_gt):

@@ -1,9 +1,6 @@
 import os
-import time
 import shutil
 import torch
-import torch.nn as nn
-import torchvision
 import numpy as np
 import random
 
@@ -11,7 +8,7 @@ from torch.utils.data import DataLoader
 from .models import DeepJointFilterModel
 from .dataset import Dataset, InferenceDataset
 from .metrics import PSNR
-from .utils import Progbar, print_fun, create_dir, imsave, stitch_images
+from .utils import Progbar, create_dir, imsave, stitch_images
 from .htmls import HTML
 
 
@@ -83,7 +80,6 @@ class DeepJointFilter(object):
 
                 self.model.backward(loss)
 
-                # import ipdb; ipdb.set_trace()
                 # metrics
                 psnr = self.psnr(gt, output)
                 mae = (torch.sum(torch.abs(gt - target)) / torch.sum(gt)).float()

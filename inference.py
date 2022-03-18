@@ -1,7 +1,4 @@
-import os
-import shutil
 import argparse
-import torch
 
 from src.parser import YamlParser
 from src.deep_joint_filter import DeepJointFilter
@@ -23,5 +20,3 @@ if __name__ == "__main__":
     djf  = DeepJointFilter(config)
     djf.load()
     djf.inference(args.target_dir, args.guide_dir, args.output_dir)
-
-    import ipdb; ipdb.set_trace()

@@ -78,8 +78,3 @@ if __name__ == "__main__":
     cnn_t = CNN()
     x = torch.randn(10,1,32,32)
     y = cnn_t(x)
-
-    
-
-    import ipdb; ipdb.set_trace()
-

@@ -2,7 +2,6 @@ import os
 import sys
 import glob
 import time
-import torch
 import numpy as np
 import PIL.Image as Image
 

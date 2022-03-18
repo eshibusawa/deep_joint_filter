@@ -13,7 +13,7 @@ class YamlParser(edict):
         if config_file is not None:
             assert(os.path.isfile(config_file))
             with open(config_file, 'r') as fo:
-                cfg_dict.update(yaml.load(fo.read()))
+                cfg_dict.update(yaml.safe_load(fo.read()))
                 cfg_dict['config_file'] = os.path.abspath(config_file)
                 cfg_dict['config_name'] = os.path.splitext(os.path.basename(config_file))[0]
                 cfg_dict['config_path'] = os.path.abspath(os.path.dirname(config_file))
@@ -25,4 +25,3 @@ class YamlParser(edict):
 
 if __name__ == "__main__":
     cfg = YamlParser(config_file="../config.yml")
-    import ipdb; ipdb.set_trace()
