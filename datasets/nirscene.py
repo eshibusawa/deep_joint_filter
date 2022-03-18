@@ -18,7 +18,7 @@ def load_flist(path):
     flist = []
     for parentname, _, filelist in walk:
         flist += [os.path.join(parentname, fn) for fn in filelist if is_image(fn)]
-    
+
     flist.sort()
     return flist
 
