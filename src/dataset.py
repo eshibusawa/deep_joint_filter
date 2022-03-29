@@ -88,8 +88,9 @@ class Dataset(torch.utils.data.Dataset):
         
         return tensor_target, tensor_guide, tensor_gt
 
-    
-    def check_channels(self, img):
+
+    @staticmethod
+    def check_channels(img):
         if img.ndim == 2:
             img = np.stack([img, img, img], axis=2)
         return img
@@ -118,8 +119,8 @@ class Dataset(torch.utils.data.Dataset):
 
         return img_target[i:i+th, j:j+tw, :], img_guide[i:i+th, j:j+tw, :], img_gt[i:i+th, j:j+tw, :]
 
-
-    def to_tensor(self, img):
+    @staticmethod
+    def to_tensor(img):
         img = Image.fromarray(img)
         img_t = F.to_tensor(img).float()  # scale of [0, 1]
 
@@ -186,53 +187,15 @@ class InferenceDataset(torch.utils.data.Dataset):
 
     def transform(self, img_target, img_guide):
         # to 3 channels
-        img_target = self.check_channels(img_target)
-        img_guide = self.check_channels(img_guide)
+        img_target = Dataset.check_channels(img_target)
+        img_guide = Dataset.check_channels(img_guide)
 
 
         # to_tensor
-        tensor_target = self.to_tensor(img_target)
-        tensor_guide = self.to_tensor(img_guide)
-        
+        tensor_target = Dataset.to_tensor(img_target)
+        tensor_guide = Dataset.to_tensor(img_guide)
+
         return tensor_target, tensor_guide
-
-    
-    def check_channels(self, img):
-        if img.ndim == 2:
-            img = np.stack([img, img, img], axis=2)
-        return img
-
-
-    def resize(self, img):
-        return np.array(Image.fromarray(img).resize(size=self.input_size))
-
-
-    def random_crop(self, img_target, img_guide, img_gt):
-        h, w, _ = img_target.shape
-        tw, th = self.input_size
-
-        i = random.randint(0, h - th if h - th > 0 else 0)
-        j = random.randint(0, w - tw if w - tw > 0 else 0)
-
-        return img_target[i:i+th, j:j+tw, :], img_guide[i:i+th, j:j+tw, :], img_gt[i:i+th, j:j+tw, :]
-
-
-    def center_crop(self, img_target, img_guide, img_gt):
-        h, w, _ = img_target.shape
-        tw, th = self.input_size
-
-        i = int(round((h - th) / 2.)) if h - th > 0 else 0
-        j = int(round((w - tw) / 2.)) if w - tw > 0 else 0
-
-        return img_target[i:i+th, j:j+tw, :], img_guide[i:i+th, j:j+tw, :], img_gt[i:i+th, j:j+tw, :]
-
-
-    def to_tensor(self, img):
-        img = Image.fromarray(img)
-        img_t = F.to_tensor(img).float()  # scale of [0, 1]
-
-        return img_t
-
 
     def create_iterator(self, batch_size):
         while True:

@@ -93,12 +93,8 @@ if __name__ == '__main__':
     context = engine.create_execution_context()
 
     # get shape and allocate memory
-    maximum_shape = engine.get_profile_shape(0, 0)[2]
-    input_dtype = engine.get_binding_dtype(0)
-    if input_dtype == trt.float32:
-        input_dtype_np = np.float32
-    elif input_dtype == trt.float16:
-        input_dtype_np = np.float16
+    maximum_shape = engine.get_profile_shape(0, engine[0])[2]
+    input_dtype_np = trt.nptype(engine.get_binding_dtype(engine[0]))
     target = np.empty(maximum_shape, input_dtype_np)
     d_target = cuda.mem_alloc(target.nbytes)
     d_guide = cuda.mem_alloc(target.nbytes)
