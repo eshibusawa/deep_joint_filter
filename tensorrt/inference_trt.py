@@ -1,5 +1,6 @@
 import argparse
 import os
+import time
 
 import tensorrt as trt
 import pycuda.driver as cuda
@@ -70,11 +71,30 @@ class TRTDataset():
 
         return  array_target, array_guide
 
+class TRTDatasetGT(TRTDataset):
+    def __init__(self, target_dir, guide_dir, gt_dir, dtype):
+        super(TRTDatasetGT, self).__init__(target_dir, guide_dir, dtype)
+        assert os.path.isdir(gt_dir)
+        self.flist_gt = load_flist(gt_dir)
+        assert len(self.flist_target) == len(self.flist_gt)
+
+    def load_gt(self, index):
+        fn_gt = self.flist_gt[index]
+        img_gt = Image.open(fn_gt)
+
+        array_gt = self.preprocess(img_gt, self.dtype)
+        return array_gt
+
+def PSNR(img1, img2):
+    mse = np.mean((img1 - img2) ** 2)
+    return 10 * np.log10(1/mse)
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_file', type=str, default='./configs/djf_rgbnir256_gaussion25.yaml', help='config file')
     parser.add_argument('--target_dir', type=str)
     parser.add_argument('--guide_dir', type=str)
+    parser.add_argument('--gt_dir', type=str)
     parser.add_argument('--output_dir', type=str, default='/tmp')
     parser.add_argument('--engine_file', type=str, default='./djf_engine.trt')
     return parser.parse_args()
@@ -85,6 +105,9 @@ if __name__ == '__main__':
     if (args.target_dir is None) or (args.guide_dir is None):
         args.target_dir = config.dataset.test['target']
         args.guide_dir = config.dataset.test['guide']
+        args.gt_dir = config.dataset.test['gt']
+
+    os.makedirs(args.output_dir, exist_ok=True)
 
     # setup engine
     runtime = trt.Runtime(trt.Logger(trt.Logger.WARNING))
@@ -101,8 +124,15 @@ if __name__ == '__main__':
     d_output = cuda.mem_alloc(target.nbytes)
 
     # setup data loader
-    tds = TRTDataset(args.target_dir, args.guide_dir, input_dtype_np)
+    gt_exists = args.gt_dir is not None
+    if gt_exists:
+        tds = TRTDatasetGT(args.target_dir, args.guide_dir, args.gt_dir, input_dtype_np)
+    else:
+        tds = TRTDataset(args.target_dir, args.guide_dir, input_dtype_np)
 
+    psnrs = list()
+    psnrNoises = list()
+    inference_times = list()
     for items, index in zip(tds, range(len(tds))):
         target = items[0]
         guide = items[1]
@@ -112,11 +142,17 @@ if __name__ == '__main__':
 
         context.set_binding_shape(0, target.shape)
         context.set_binding_shape(1, guide.shape)
+        t = time.time()
         cuda.memcpy_htod_async(d_target, target, stream)
         cuda.memcpy_htod_async(d_guide, guide, stream)
         context.execute_async_v2(bindings, stream.handle, None)
         cuda.memcpy_dtoh_async(output, d_output, stream)
         stream.synchronize()
+        inference_times.append(time.time() - t)
+        if gt_exists:
+            gt = tds.load_gt(index)
+            psnrs.append(PSNR(gt, output))
+            psnrNoises.append(PSNR(gt, target))
 
         output_uint8 = tds.postprocess(output.squeeze())
         img_output = Image.fromarray(output_uint8)
@@ -126,3 +162,11 @@ if __name__ == '__main__':
     d_target.free()
     d_guide.free()
     d_output.free()
+
+    average_inference_time = np.average(np.array(inference_times))
+    if gt_exists:
+        average_psnr = np.average(np.array(psnrs))
+        average_psnrNoise = np.average(np.array(psnrNoises))
+        print('Time: {}, PSNR {}, PSNRN {}'.format(average_inference_time, average_psnr, average_psnrNoise))
+    else:
+        print('Time: {}'.format(average_inference_time))

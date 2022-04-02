@@ -91,8 +91,8 @@ python export_onnx.py
 
 TensorRTのengineを構築する
 ```sh
-/path/to/tensorrt_sample/bin/trtexec --maxShapes=target_image:1x3x768x1024,guide_image:1x3x768x1024 --optShapes=target_image:1x3x682x1024,guide_image:1x3x682x1024 --minShapes=target_image:1x3x633x502,guide_image:1x3x633x502 --onnx=djf.onnx --saveEngine=djf_engine.trt
-/path/to/tensorrt_sample/bin/trtexec --maxShapes=target_image:1x3x768x1024,guide_image:1x3x768x1024 --optShapes=target_image:1x3x682x1024,guide_image:1x3x682x1024 --minShapes=target_image:1x3x633x502,guide_image:1x3x633x502 --onnx=djf.onnx --saveEngine=djf_engine_fp16.trt --inputIOFormats=fp16:chw --outputIOFormats=fp16:chw --fp16
+/path/to/tensorrt_sample/bin/trtexec --maxShapes=target_image:1x3x768x1024,guide_image:1x3x768x1024 --optShapes=target_image:1x3x682x1024,guide_image:1x3x682x1024 --minShapes=target_image:1x3x620x501,guide_image:1x3x620x501 --onnx=djf.onnx --saveEngine=djf_engine.trt
+/path/to/tensorrt_sample/bin/trtexec --maxShapes=target_image:1x3x768x1024,guide_image:1x3x768x1024 --optShapes=target_image:1x3x682x1024,guide_image:1x3x682x1024 --minShapes=target_image:1x3x620x501,guide_image:1x3x620x501 --onnx=djf.onnx --saveEngine=djf_engine_fp16.trt --inputIOFormats=fp16:chw --outputIOFormats=fp16:chw --fp16
 ```
 `djf_engine.trt`と`djf_engine_fp16.trt`が出力されたことを確認
 TensorRTで動作確認する
